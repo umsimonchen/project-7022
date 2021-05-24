@@ -14,7 +14,7 @@ class Blockchain(object):
         # Create the genesis block
         self.new_block(previous_hash=1, proof=100)
 
-    def new_block(self, proof, previous_hash=None):
+    def new_block(self, proof, previous_hash=None, idx=None):
         """
         Create a new Block in the Blockchain
         :param proof: <int> The proof given by the Proof of Work algorithm
@@ -28,6 +28,7 @@ class Blockchain(object):
             'transactions': self.current_transactions,
             'proof': proof,
             'previous_hash': previous_hash or self.hash(self.chain[-1]),
+            'idx': idx
         }
 
         # Reset the current list of transactions

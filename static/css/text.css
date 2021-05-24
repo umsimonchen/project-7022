@@ -1,0 +1,8 @@
+/* Set the size of the div element that contains the map */
+#map {
+  height: 80%;
+  /* The height is 400 pixels */
+  width: 80%;
+  /* The width is the width of the web page */
+  align-items: center
+}
