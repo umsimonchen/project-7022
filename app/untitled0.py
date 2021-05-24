@@ -7,7 +7,6 @@ Created on Sat May 22 12:08:12 2021
 import geopandas
 import pandas as pd
 from flask import Flask, jsonify, request, render_template, redirect, url_for
-import matplotlib as plt
 
 app = Flask(__name__, template_folder='../templates', static_folder = '../static')
 #app._static_folder = '../static'

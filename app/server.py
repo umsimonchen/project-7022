@@ -3,14 +3,16 @@
 #from textwrap import dedent
 #from time import time
 from uuid import uuid4
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request, render_template
 from blockchain import Blockchain
 import numpy as np
 import geopandas
+import json
 import pandas as pd
+from rtree import index
 
 # Instantiate our Node
-app = Flask(__name__)
+app = Flask(__name__, template_folder='../templates', static_folder = '../static')
 
 # Generate a globally unique address for this node
 k=1000 #1000 users
@@ -18,28 +20,21 @@ node_identifiers = [str(uuid4()).replace('-', '') for i in range(k)]
 # Instantiate the Blockchain
 blockchain = Blockchain()
 node_index=0
-gdf = pd.DataFrame({'Latitude': [],'Longitude': []})
-gdf = geopandas.GeoDataFrame(
-    gdf, geometry=geopandas.points_from_xy(gdf.Longitude, gdf.Latitude))
+
+world = geopandas.read_file(geopandas.datasets.get_path('naturalearth_lowres'))
+
+
+#idx = index.Index()
+#r_index=0
+#idx.insert(4321, (34.56, 56.32, 34.56, 56.32))
 
 @app.route('/geomap',methods=['GET'])
 def geomap():
-    latitudes=[]
-    longtitudes=[]
+    locations = []
     for block in blockchain.chain:
-        for transaction in block['transactions']:
-            latitudes.append(transaction['location'][0])
-            longtitudes.append(transaction['location'][1])
-            
-    new_gdf=pd.DataFrame({'Latitude': latitudes,'Longitude': longtitudes})
-    new_gdf = geopandas.GeoDataFrame(
-        new_gdf, geometry=geopandas.points_from_xy(new_gdf.Longitude, new_gdf.Latitude))
-    gdf.append(new_gdf, ignore_index = True)
-    response = {
-        'latitudes': latitudes,
-        'longtitudes': longtitudes
-    }
-    return jsonify(response), 200
+        for trans in block['transactions']:
+            locations.append({'lat': trans['location'][0], 'lng': trans['location'][1]})
+    return render_template("geomap.html", loc=locations)
     
 @app.route('/mine', methods=['GET'])
 def mine():
@@ -51,40 +46,44 @@ def mine():
     # We must receive a reward for finding the proof.
     # The sender is "0" to signify that this node has mined a new coin.
     
-    for i in range(50000):
+    for i in range(5):
         u1, u2 = np.random.choice(range(k), size=2, replace=False)
+        lat = np.random.rand()*180-90
+        lon = np.random.rand()*360-180
+        #idx.insert(i, (lat, lon, lat, lon))
         blockchain.current_transactions.append({
                 'sender': node_identifiers[u1],
                 'verifer': node_identifiers[u2],
-                'location': [np.random.rand()*180-90, np.random.rand()*360-180]
+                'location': [lat, lon]
             })
 
-    # Forge the new Block by adding it to the chain
+    # Forge the new Block by adding it to the chain\
     previous_hash = blockchain.hash(last_block)
-    block = blockchain.new_block(proof, previous_hash)
+    block = blockchain.new_block(proof, previous_hash, None)
+    
     response = {
         'message': "New Block Forged",
         'index': block['index'],
         'transactions': block['transactions'],
         'proof': block['proof'],
         'previous_hash': block['previous_hash'],
+        'idx': str(block['idx'])
     }
     return jsonify(response), 200
 
 @app.route('/transactions/new', methods=['POST'])  # this is a POST request, since we’ll be sending data to it.
 def new_transaction(sender, recipient, amount):
     values = request.get_json()
-    print("i am here: ",values)
     # Check that the required fields are in the POST'ed data
     required = ['sender', 'recipient', 'amount']
     if not all(k in values for k in required):
         return 'Missing values', 400
 
     # Create a new Transaction
-    index = blockchain.new_transaction(values['sender'], values['recipient'], 
+    new = blockchain.new_transaction(values['sender'], values['recipient'], 
                                        values['data'])
 
-    response = {'message': f'Transaction will be added to Block {index}'}
+    response = {'message': f'Transaction will be added to Block {new}'}
     return jsonify(response), 201
 
 @app.route('/chain', methods=['GET'])
@@ -94,44 +93,6 @@ def full_chain():
         'length': len(blockchain.chain),
     }
     return jsonify(response), 200
-
-
-@app.route('/nodes/register', methods=['POST'])
-def register_nodes():
-    values = request.get_json()
-
-    nodes = values.get('nodes')
-    print(nodes)
-    if nodes is None:
-        return "Error: Please supply a valid list of nodes", 400
-
-    for node in nodes:
-        blockchain.register_node(node)
-
-    response = {
-        'message': 'New nodes have been added',
-        'total_nodes': list(blockchain.nodes),
-    }
-    return jsonify(response), 201
-
-
-@app.route('/nodes/resolve', methods=['GET'])
-def consensus():
-    replaced = blockchain.resolve_conflicts()
-
-    if replaced:
-        response = {
-            'message': 'Our chain was replaced',
-            'new_chain': blockchain.chain
-        }
-    else:
-        response = {
-            'message': 'Our chain is authoritative',
-            'chain': blockchain.chain
-        }
-
-    return jsonify(response), 200
-
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000)

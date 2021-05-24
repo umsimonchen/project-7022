@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Blockchain Geomap</title>
+
+    <style type="text/css">
+      /* Set the size of the div element that contains the map */
+      #map {
+        height: 700px;
+        /* The height is 400 pixels */
+        width: 100%;
+        /* The width is the width of the web page */
+      }
+    </style>
+		<script src="https://unpkg.com/@googlemaps/markerclustererplus/dist/index.min.js"></script>
+    <script>
+			function initMap() {
+				const labels = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+
+				const map = new google.maps.Map(document.getElementById("map"), {
+					zoom: 4,
+					center: { lat: -28.024, lng: 140.887 },
+				});
+
+				const markers = locations.map((location, i) => {
+					return new google.maps.Marker({
+					position: location,
+					label: i.toString(),
+					map: map,
+					});
+				});
+
+				new MarkerClusterer(map, markers, {
+					imagePath:
+					"https://developers.google.com/maps/documentation/javascript/examples/markerclusterer/m",
+				});
+			}
+	  
+			var locations = {{ loc | safe }};
+
+    </script>
+  </head>
+  <body>
+    <h3>Blockchain Geomap</h3>
+    <!--The div element for the map -->
+    <div id="map"></div>
+
+    <!-- Async script executes immediately and must be after any DOM elements used in callback. -->
+    <script
+      src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCxew-Rj9YRfMwCUncnAouRBxqCj1tqTi0&callback=initMap&libraries=&v=weekly"
+      async
+    ></script>
+  </body>
+</html>
