@@ -9,6 +9,7 @@ import numpy as np
 import geopandas
 import json
 import pandas as pd
+from pandana.loaders import osm
 from rtree import index
 
 # Instantiate our Node
@@ -22,11 +23,6 @@ blockchain = Blockchain()
 node_index=0
 
 world = geopandas.read_file(geopandas.datasets.get_path('naturalearth_lowres'))
-
-
-#idx = index.Index()
-#r_index=0
-#idx.insert(4321, (34.56, 56.32, 34.56, 56.32))
 
 @app.route('/geomap',methods=['GET'])
 def geomap():
@@ -46,16 +42,16 @@ def mine():
     # We must receive a reward for finding the proof.
     # The sender is "0" to signify that this node has mined a new coin.
     
-    for i in range(5):
-        u1, u2 = np.random.choice(range(k), size=2, replace=False)
-        lat = np.random.rand()*180-90
-        lon = np.random.rand()*360-180
-        #idx.insert(i, (lat, lon, lat, lon))
-        blockchain.current_transactions.append({
-                'sender': node_identifiers[u1],
-                'verifer': node_identifiers[u2],
-                'location': [lat, lon]
-            })
+    # for i in range(5):
+    #     u1, u2 = np.random.choice(range(k), size=2, replace=False)
+    #     lat = np.random.rand()*180-90
+    #     lon = np.random.rand()*360-180
+    #     #idx.insert(i, (lat, lon, lat, lon))
+    #     blockchain.current_transactions.append({
+    #             'sender': node_identifiers[u1],
+    #             'verifer': node_identifiers[u2],
+    #             'location': [lat, lon]
+    #         })
 
     # Forge the new Block by adding it to the chain\
     previous_hash = blockchain.hash(last_block)
@@ -66,22 +62,21 @@ def mine():
         'index': block['index'],
         'transactions': block['transactions'],
         'proof': block['proof'],
-        'previous_hash': block['previous_hash'],
-        'idx': str(block['idx'])
+        'previous_hash': block['previous_hash']
     }
     return jsonify(response), 200
 
 @app.route('/transactions/new', methods=['POST'])  # this is a POST request, since we’ll be sending data to it.
-def new_transaction(sender, recipient, amount):
+def new_transaction(longitude, latitude, description):
     values = request.get_json()
     # Check that the required fields are in the POST'ed data
-    required = ['sender', 'recipient', 'amount']
+    required = ['longitude', 'latitude', 'description']
     if not all(k in values for k in required):
         return 'Missing values', 400
 
     # Create a new Transaction
-    new = blockchain.new_transaction(values['sender'], values['recipient'], 
-                                       values['data'])
+    new = blockchain.new_transaction(values['longitude'], values['latitude'], 
+                                       values['description'])
 
     response = {'message': f'Transaction will be added to Block {new}'}
     return jsonify(response), 201
