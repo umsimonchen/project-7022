@@ -4,6 +4,7 @@ from time import time
 from urllib.parse import urlparse
 import requests
 
+DIFFICULT = 4
 
 class Blockchain(object):
     def __init__(self):
@@ -89,7 +90,7 @@ class Blockchain(object):
 
         guess = f'{last_proof}{proof}'.encode()
         guess_hash = hashlib.sha256(guess).hexdigest()
-        return guess_hash[:4] == "0000"
+        return guess_hash[:4] == "0" * DIFFICULT
 
 
     def register_node(self, address):
