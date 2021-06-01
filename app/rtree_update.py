@@ -2,7 +2,7 @@ from rtree import index
 
 class Rtree():
   def __init__(self):
-    self.idx = None
+    self.idx = index.Index()
     self.block_count = 0
 
   def get_rtree_index(self):
