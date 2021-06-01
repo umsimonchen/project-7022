@@ -4,15 +4,16 @@
 #from time import time
 from uuid import uuid4
 from flask import Flask, jsonify, request, render_template
-from blockchain import Blockchain
-from map_data import Coordinate
 import traceback
 import numpy as np
 import geopandas
 import json
 import pandas as pd
-from pandana.loaders import osm
-from rtree import index
+
+## from our files
+from blockchain import Blockchain
+from map_data import Coordinate
+from rtree_update import Rtree
 
 # Instantiate our Node
 app = Flask(__name__, template_folder='../templates', static_folder = '../static')
@@ -35,7 +36,7 @@ def geomap():
         for trans in block['transactions']:
             locations.append({'lat': trans['location'][0], 'lng': trans['location'][1]})
     return render_template("geomap.html", loc=locations)
-    
+
 @app.route('/mine', methods=['GET'])
 def mine():
     # We run the proof of work algorithm to get the next proof...
@@ -45,7 +46,7 @@ def mine():
 
     # We must receive a reward for finding the proof.
     # The sender is "0" to signify that this node has mined a new coin.
-    
+
     # for i in range(5):
     #     u1, u2 = np.random.choice(range(k), size=2, replace=False)
     #     lat = np.random.rand()*180-90
@@ -60,7 +61,7 @@ def mine():
     # Forge the new Block by adding it to the chain\
     previous_hash = blockchain.hash(last_block)
     block = blockchain.new_block(proof, previous_hash, None)
-    
+
     response = {
         'message': "New Block Forged",
         'index': block['index'],
@@ -79,7 +80,7 @@ def new_transaction(longitude, latitude, description):
         return 'Missing values', 400
 
     # Create a new Transaction
-    new = blockchain.new_transaction(values['longitude'], values['latitude'], 
+    new = blockchain.new_transaction(values['longitude'], values['latitude'],
                                        values['description'])
 
     response = {'message': f'Transaction will be added to Block {new}'}
@@ -115,6 +116,11 @@ def get_coordinates():
         "info": amenity_group.to_dict('index')
     }
     return jsonify(response), 200
+
+@app.route('/get_one_coordinate_form_amenity_group', methods=['GET'])
+def get_one_coordinate():
+    if amenity_group is None: return "Please call get_coordinate API to get amenity_group.", 400
+
 
 ## error handle and show traceback
 def error_handling(e):
