@@ -1,14 +1,18 @@
 from pandana.loaders import osm
+import pandas as pd
 
 class Coordinate():
   def __init__(self):
-    self.amenity_group = None
+    self.amenity_group = pd.DataFrame()
 
   def get_amenity_group(self):
     return self.amenity_group
 
   def check_amenity_group_none(self):
-    return self.amenity_group == None
+    return self.amenity_group.empty
+
+  def make_amenity_group_to_none(self):
+    self.amenity_group = None
 
 # tag can choose: [restaurant, cafe, bar, school, university]
   def get_amenity_from_osm(self, lat_min, lon_min, lat_max, lon_max, type_name='restaurant'):

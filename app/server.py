@@ -8,7 +8,6 @@ import numpy as np
 import geopandas
 import json
 import pandas as pd
-import random
 
 ## from our files
 from blockchain import Blockchain
@@ -27,7 +26,7 @@ coordinate = Coordinate()
 rtree = Rtree()
 node_index=0
 coordinate = Coordinate()
-amenity_group = None
+
 world = geopandas.read_file(geopandas.datasets.get_path('naturalearth_lowres'))
 
 
@@ -89,18 +88,40 @@ def update_coordinate_by_input():
         required = ['action', 'point']
         if not all(k in values for k in required):
             return 'Missing values', 400
-        point_required = ['lat', 'lon', 'name']
+        point_required = ['id', 'lat', 'lon', 'name']
         if not all(k in values["point"] for k in point_required):
-            return 'Point must have lat, lon and name', 400
-
-        point_id = random.randint(100000000000, 999999999999)
+            return 'Point must have id, lat, lon and name', 400
 
         # Create a new Transaction
-        new = blockchain.new_transaction(point_id, values["point"]['lat'], values["point"]['lon'], values["point"]['name'], values["action"])
+        new = blockchain.new_transaction(values["point"]['id'], values["point"]['lat'], values["point"]['lon'], values["point"]['name'], values["action"])
         count += 1
 
     response = {'message': f'{count} Transactions will be added to Block {new}'}
     return jsonify(response), 201
+
+@app.route('/update_coordinate_by_search_result', methods=['POST'])  # this is a POST request, since we’ll be sending data to it.
+def update_coordinate_by_search_result():
+    count = 0
+    if coordinate.check_amenity_group_none() == True: return "No Data have to update.", 200
+
+    amenity_group_list = coordinate.get_amenity_group().reset_index().values.tolist()
+    for item in amenity_group_list:
+        point_id = item[0]
+        lat = item[1]
+        lon = item[2]
+        name = item[3]
+
+        # Create a new Transaction
+        new = blockchain.new_transaction(point_id, lat, lon, name, 0)
+        count += 1
+    amenity_group_list = None
+    coordinate.make_amenity_group_to_none()
+
+    response = {'message': f'{count} Transactions will be added to Block {new}'}
+    return jsonify(response), 201
+
+
+
 
 @app.route('/chain', methods=['GET'])
 def full_chain():
@@ -116,7 +137,7 @@ def full_chain():
 @app.route('/get_coordinates', methods=['GET'])
 def get_coordinates():
     try:
-        input = get_params_checking(request, ["lat_min", "lon_min", "lat_max", "lon_max", "type_name"], ["lat_min", "lon_min", "lat_max", "lon_max"])
+        input = get_params_checking(request, ["lat_min", "lon_min", "lat_max", "lon_max"], ["lat_min", "lon_min", "lat_max", "lon_max"])
         amenity_group = coordinate.get_amenity_from_osm(input["lat_min"], input["lon_min"], input["lat_max"], input["lon_max"])
     except Exception as e:
         return error_handling(e)
@@ -133,8 +154,7 @@ def get_coordinates():
 @app.route('/show_rtree_idx', methods=['GET'])
 def show_rtree_idx():
     a, b = rtree.get_rtree_index()
-    print(a, b)
-    return "", 200
+    return "inputed_block = %s,\n idx = %s" % (a, str(b)), 200
 
 @app.route("/update_rtree_index", methods=['POST'])
 def update_rtree_index():
@@ -143,12 +163,10 @@ def update_rtree_index():
         required = ['action', 'point']
         if not all(k in values for k in required):
             return 'Missing values', 400
-        point_required = ['lat', 'lon', 'name']
+        point_required = ['id', 'lat', 'lon', 'name']
         if not all(k in values["point"] for k in point_required):
-            return 'Point must have lat, lon and name', 400
+            return 'Point must have id, lat, lon and name', 400
 
-        point_id = random.randint(100000000000, 999999999999)
-        values["point"]["id"] = point_id
         response = rtree.update_index(values["point"], values["action"])
     return response, 200
 
@@ -186,8 +204,10 @@ def error_handling(e):
 
 def get_params_checking(request, blank_checking, float_checking=None, integer_checking=None):
     input = {}
+    for i in request.args:
+        input[i] = request.args.get(i)
     for i in blank_checking:
-        value = request.args.get(i)
+        value = input[i]
         if value is None or value == "": raise ValueError("Key '%s' must be filled in." % i)      ## check all coordinates params has been filled in
         if i in float_checking:
             try:
