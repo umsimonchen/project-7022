@@ -11,7 +11,7 @@ class Blockchain(object):
         self.current_transactions = []
         self.chain = []
         self.nodes = set()
-        
+
         # Create the genesis block
         self.new_block(previous_hash=1, proof=100)
 
@@ -37,12 +37,13 @@ class Blockchain(object):
         self.chain.append(block)
         return block
 
-    def new_transaction(self, longitude, latitude, description):
-
+    def new_transaction(self, point_id, lat, lon, name, action):
         self.current_transactions.append({
-            'longitude': longitude,
-            'latitude': latitude,
-            'description': description,
+            'action': action,
+            'id': point_id,
+            'lat': lat,
+            'lon': lon,
+            'name': name,
         })
 
         return self.last_block['index'] + 1
@@ -89,7 +90,7 @@ class Blockchain(object):
 
         guess = f'{last_proof}{proof}'.encode()
         guess_hash = hashlib.sha256(guess).hexdigest()
-        return guess_hash[:4] == "0" * DIFFICULT
+        return guess_hash[:DIFFICULT] == "0" * DIFFICULT
 
 
     def register_node(self, address):
