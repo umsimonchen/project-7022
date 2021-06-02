@@ -6,19 +6,8 @@ from flask import Flask, jsonify, request, render_template
 import traceback
 import numpy as np
 import geopandas
-<<<<<<< HEAD
-import json
-import pandas as pd
-import random
-
-## from our files
-from blockchain import Blockchain
-from map_data import Coordinate
-from rtree_update import Rtree
-=======
 from map_data import Coordinate
 import traceback
->>>>>>> 34ea5a199b78d269d52bce9169897475c8483801
 
 # Instantiate our Node
 app = Flask(__name__, template_folder='../templates', static_folder = '../static')
@@ -31,12 +20,6 @@ blockchain = Blockchain()
 coordinate = Coordinate()
 rtree = Rtree()
 node_index=0
-<<<<<<< HEAD
-amenity_group = None
-
-world = geopandas.read_file(geopandas.datasets.get_path('naturalearth_lowres'))
-
-=======
 coordinate = Coordinate()
 amenity_group = None
 world = geopandas.read_file(geopandas.datasets.get_path('naturalearth_lowres'))
@@ -74,7 +57,6 @@ def error_handling(e):
     traceback.print_exc()
     return ("%s: %s" % (type(e).__name__, e.args[0]), 400)
 
->>>>>>> 34ea5a199b78d269d52bce9169897475c8483801
 @app.route('/geomap',methods=['GET'])
 def geomap():
     locations = []
@@ -140,7 +122,6 @@ def full_chain():
     }
     return jsonify(response), 200
 
-<<<<<<< HEAD
 ## get coordinate data api
 @app.route('/get_coordinates', methods=['GET'])
 def get_coordinates():
@@ -214,19 +195,5 @@ def get_params_checking(request, blank_checking, float_checking=None, integer_ch
         input[i] = value
     return input
 
-=======
-@app.route('/')
-def home():
-   return render_template("home.html")
- 
-@app.route('/data/', methods = ['POST', 'GET'])
-def data():
-    if request.method == 'GET':
-        return f"The URL /data is accessed directly. Try going to '/form' to submit form"
-    if request.method == 'POST':
-        form = request.form
-        return render_template('data.html',form = form)
-    
->>>>>>> 34ea5a199b78d269d52bce9169897475c8483801
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000)
