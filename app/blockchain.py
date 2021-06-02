@@ -104,18 +104,18 @@ class Blockchain(object):
         self.nodes.add(parsed_url.netloc)
 
 
-    def valid_chain(self, chain):
+    def valid_chain(self):
         """
         Determine if a given blockchain is valid
         :param chain: <list> A blockchain
         :return: <bool> True if valid, False if not
         """
 
-        last_block = chain[0]
+        last_block = self.chain[0]
         current_index = 1
 
-        while current_index < len(chain):
-            block = chain[current_index]
+        while current_index < len(self.chain):
+            block = self.chain[current_index]
             print(f'{last_block}')
             print(f'{block}')
             print("\n-----------\n")

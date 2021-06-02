@@ -120,7 +120,10 @@ def update_coordinate_by_search_result():
     response = {'message': f'{count} Transactions will be added to Block {new}'}
     return jsonify(response), 201
 
-
+@app.route('/validate_chain', methods=['GET'])
+def validate_chain():
+    result = blockchain.valid_chain()
+    return "The result of the chain validation is %s" % result, 200
 
 
 @app.route('/chain', methods=['GET'])
@@ -134,7 +137,7 @@ def full_chain():
 
 
 ## get coordinate data api
-'''
+
 @app.route('/get_coordinates', methods=['GET'])
 def get_coordinates():
     try:
@@ -147,7 +150,7 @@ def get_coordinates():
         "info": amenity_group.to_dict('index')
     }
     return jsonify(response), 200
-'''
+
 
 
 
