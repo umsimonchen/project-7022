@@ -8,7 +8,7 @@ class Rtree():
   def get_rtree_index(self):
     return self.block_count, self.idx
 
-  def update_index(self, point, action):    ## point: {id, lat, lon, name, action: (insert=0/delete=1)}
+  def update_index(self, point, action):    ## point: {id, lat, lon, name}, action: (insert=0/delete=1)
     if action == 0:
       self.idx.insert(point["id"], (point["lat"], point["lon"], point["lat"], point["lon"]), obj = point["name"])
       return "Insert Success"
