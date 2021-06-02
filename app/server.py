@@ -53,10 +53,6 @@ world = geopandas.read_file(geopandas.datasets.get_path('naturalearth_lowres'))
 #     }
 #     return jsonify(response), 200
 
-## error handle and show traceback
-def error_handling(e):
-    traceback.print_exc()
-    return ("%s: %s" % (type(e).__name__, e.args[0]), 400)
 
 @app.route('/geomap',methods=['GET'])
 def geomap():
@@ -68,24 +64,9 @@ def geomap():
 
 @app.route('/mine', methods=['GET'])
 def mine():
-    # We run the proof of work algorithm to get the next proof...
     last_block = blockchain.last_block
     last_proof = last_block['proof']
     proof = blockchain.proof_of_work(last_proof)
-
-    # We must receive a reward for finding the proof.
-    # The sender is "0" to signify that this node has mined a new coin.
-
-    # for i in range(5):
-    #     u1, u2 = np.random.choice(range(k), size=2, replace=False)
-    #     lat = np.random.rand()*180-90
-    #     lon = np.random.rand()*360-180
-    #     #idx.insert(i, (lat, lon, lat, lon))
-    #     blockchain.current_transactions.append({
-    #             'sender': node_identifiers[u1],
-    #             'verifer': node_identifiers[u2],
-    #             'location': [lat, lon]
-    #         })
 
     # Forge the new Block by adding it to the chain\
     previous_hash = blockchain.hash(last_block)
@@ -100,19 +81,25 @@ def mine():
     }
     return jsonify(response), 200
 
-@app.route('/transactions/new', methods=['POST'])  # this is a POST request, since we’ll be sending data to it.
-def new_transaction(longitude, latitude, description):
-    values = request.get_json()
-    # Check that the required fields are in the POST'ed data
-    required = ['longitude', 'latitude', 'description']
-    if not all(k in values for k in required):
-        return 'Missing values', 400
+@app.route('/update_coordinate_by_input', methods=['POST'])  # this is a POST request, since we’ll be sending data to it.
+def update_coordinate_by_input():
+    array_values = request.get_json()
+    count = 0
+    for values in array_values:
+        required = ['action', 'point']
+        if not all(k in values for k in required):
+            return 'Missing values', 400
+        point_required = ['lat', 'lon', 'name']
+        if not all(k in values["point"] for k in point_required):
+            return 'Point must have lat, lon and name', 400
 
-    # Create a new Transaction
-    new = blockchain.new_transaction(values['longitude'], values['latitude'],
-                                       values['description'])
+        point_id = random.randint(100000000000, 999999999999)
 
-    response = {'message': f'Transaction will be added to Block {new}'}
+        # Create a new Transaction
+        new = blockchain.new_transaction(point_id, values["point"]['lat'], values["point"]['lon'], values["point"]['name'], values["action"])
+        count += 1
+
+    response = {'message': f'{count} Transactions will be added to Block {new}'}
     return jsonify(response), 201
 
 @app.route('/chain', methods=['GET'])
@@ -122,6 +109,8 @@ def full_chain():
         'length': len(blockchain.chain),
     }
     return jsonify(response), 200
+
+
 
 ## get coordinate data api
 @app.route('/get_coordinates', methods=['GET'])
@@ -137,9 +126,8 @@ def get_coordinates():
     }
     return jsonify(response), 200
 
-@app.route('/get_one_coordinate_form_amenity_group', methods=['GET'])
-def get_one_coordinate():
-    if amenity_group is None: return "Please call get_coordinate API to get amenity_group.", 400
+
+
 
 ## API for Rtree
 @app.route('/show_rtree_idx', methods=['GET'])
