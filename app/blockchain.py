@@ -7,15 +7,17 @@ import requests
 DIFFICULT = 4
 
 class Blockchain(object):
-    def __init__(self):
+    def __init__(self, rtree):
         self.current_transactions = []
         self.chain = []
         self.nodes = set()
 
-        # Create the genesis block
-        self.new_block(previous_hash=1, proof=100)
+        rtree_signature = self.idx_hash(idx = rtree.idx)
 
-    def new_block(self, proof, previous_hash=None, idx=None):
+        # Create the genesis block
+        self.new_block(previous_hash=1, proof=100, rtree_signature=rtree_signature)
+
+    def new_block(self, proof, rtree_signature, previous_hash=None, idx=None):
         """
         Create a new Block in the Blockchain
         :param proof: <int> The proof given by the Proof of Work algorithm
@@ -28,7 +30,8 @@ class Blockchain(object):
             'timestamp': time(),
             'transactions': self.current_transactions,
             'proof': proof,
-            'previous_hash': previous_hash or self.hash(self.chain[-1])
+            'previous_hash': previous_hash or self.hash(self.chain[-1]),
+            'rtree_signature': rtree_signature
         }
 
         # Reset the current list of transactions
@@ -53,7 +56,11 @@ class Blockchain(object):
         return self.chain[-1]
 
     @staticmethod
-    def hash(block):
+    def idx_hash(idx):
+        idx_string = json.dumps(str(idx), sort_keys=True).encode()
+        return hashlib.sha256(idx_string).hexdigest()
+
+    def hash(self, block):
         """
         Creates a SHA-256 hash of a Block
         :param block: <dict> Block
