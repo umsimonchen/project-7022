@@ -1,2 +1,57 @@
-<h1>Welcome to the HomePage!</h1>
-<img src="{{url_for('static', filename='images/geomap.png')}}">
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hook</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/shorthandcss@1.1.1/dist/shorthand.min.css" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Muli:200,300,400,500,600,700,800,900&display=swap" />
+    <link rel="stylesheet" type="text/css"
+        href="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.9.0/slick.min.css" />
+    <link rel="stylesheet" type="text/css" href="//cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick-theme.css" />
+</head>
+
+<body class="bg-black muli">
+    <nav class="w-100pc flex flex-column md-flex-row md-px-10 py-5 bg-black">
+				<div class="flex justify-between">
+              <img style="height: 80%" src="{{url_for('static', filename='images/logo.png')}}"/>
+        </div>
+				
+        <div id="nav-items" class="hidden flex sm-w-100pc flex-column md-flex md-flex-row md-justify-end items-center">
+            <a href="#home" class="fs-s1 mx-3 py-3 indigo no-underline hover-underline">Home</a>
+            <a href="#features" class="fs-s1 mx-3 py-3 indigo no-underline hover-underline">Features</a>
+            <a href="#blog" class="fs-s1 mx-3 py-3 indigo no-underline hover-underline">About Us</a>
+        </div>
+    </nav>
+
+    <section id="home" class="min-h-100vh flex justify-start items-center">
+        <div class="mx-5 md-mx-l5" style="float:left; width: 30%">
+            <div>
+                <h1 class="white fs-l3 lh-2 md-fs-xl1 md-lh-1 fw-900 ">Find Your <br />Restaurants<br /> Nearby</h1>
+
+                <div class="br-8 mt-10 inline-flex">
+										<form action="/data" method = "POST">
+												<input type="number"
+														class="input-lg half bw-0 fw-200 bg-indigo-lightest-10 white ph-indigo-lightest focus-white opacity-80 fs-s3 py-5 min-w-25vw br-r-0"
+														step=any  min="-90" max="90" name = "Latitude"
+														placeholder="Latitude" />
+												<br />
+												<input type="number"
+														class="input-lg half bw-0 fw-200 bg-indigo-lightest-10 white ph-indigo-lightest focus-white opacity-80 fs-s3 py-5 min-w-25vw br-r-0"
+														step=any  min="-180" max="180" name = "Longtitude"
+														placeholder="Longtitude" />
+												<br />
+												<input
+														class="button-lg bg-indigo-lightest-20 indigo-lightest focus-white fw-300 fs-s3 mr-0 br-l-0" type = "submit" value = "Search"/>
+										</form>
+								</div>
+            </div>
+        </div>
+				<div class="mx-5 md-mx-l5" style="float:right;width: 120%">
+						<img src="{{url_for('static', filename='images/map.png')}}">
+				</div>
+    </section>
+</body>
+
+</html>
