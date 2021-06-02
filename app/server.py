@@ -105,8 +105,8 @@ def update_coordinate_by_input():
 @app.route('/chain', methods=['GET'])
 def full_chain():
     response = {
-        'chain': blockchain.chain,
         'length': len(blockchain.chain),
+        'chain': blockchain.chain,
     }
     return jsonify(response), 200
 
