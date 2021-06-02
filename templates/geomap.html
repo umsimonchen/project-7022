@@ -22,6 +22,17 @@
     </style>
 		<script src="https://unpkg.com/@googlemaps/markerclustererplus/dist/index.min.js"></script>
     <script>
+    	function addInfoWindow(marker, message) {
+
+          var infoWindow = new google.maps.InfoWindow({
+              content: message
+          });
+
+          google.maps.event.addListener(marker, 'click', function () {
+              infoWindow.open(map, marker);
+          });
+      };
+      
 			function initMap() {
 				const labels = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
@@ -32,20 +43,25 @@
 
 				const markers = locations.map((location, i) => {
 					return new google.maps.Marker({
-					position: location,
-					label: (i+1).toString(),
-					map: map,
+						position: location,
+						map: map,
+						label: (i+1).toString(),
+						title: titles[i],
 					});
 				});
 
+				var len = markers.length;
+				for (i = 0; i < len; i++) { 
+					addInfoWindow(markers[i], titles[i]);
+				};
+
 				new MarkerClusterer(map, markers, {
 					imagePath:
-					"https://developers.google.com/maps/documentation/javascript/examples/markerclusterer/m",
+						"https://developers.google.com/maps/documentation/javascript/examples/markerclusterer/m",
 				});
-			}
-	  
+			};
+	  	var titles = {{ labels | safe }};
 			var locations = {{ loc | safe }};
-
     </script>
   </head>
   <body class="bg-black muli">
@@ -61,13 +77,17 @@
     </nav>
     <!--The div element for the map -->
 		<div class="br-8 mt-10 inline-flex" style="padding-left: 90px;">
-				<form action="/data" method = "POST">
+				<form action="/get_nearest_k_points" method = "GET">
 						<input type="number" class="input-lg bw-0 fw-200 bg-indigo-lightest-10 white ph-indigo-lightest focus-white opacity-80 fs-s3 py-5 min-w-25vw br-r-0"
-								step=any  min="-90" max="90" name = "Latitude"
+								step=any  min="-90" max="90" name = "lat"
 								placeholder="Latitude">
 						<input type="number" class="input-lg bw-0 fw-200 bg-indigo-lightest-10 white ph-indigo-lightest focus-white opacity-80 fs-s3 py-5 min-w-25vw br-r-0"
-								step=any  min="-180" max="180" name = "Longtitude"
+								step=any  min="-180" max="180" name = "lon"
 								placeholder="Longtitude">
+						<input type="number"
+								class="input-lg bw-0 fw-200 bg-indigo-lightest-10 white ph-indigo-lightest focus-white opacity-80 fs-s3 py-5 min-w-25vw br-r-0"
+								min="1" name = "k"
+								placeholder="K" >
 						<input
 								class="button-lg bg-indigo-lightest-20 indigo-lightest focus-white fw-300 fs-s3 mr-0 br-l-0" type = "submit" value = "Search"/>
 				</form>

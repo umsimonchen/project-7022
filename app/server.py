@@ -171,27 +171,22 @@ def get_nearest_k_points():
     try:
         input = get_params_checking(request, ["lat", "lon", "k"], ["lat", "lon"], ["k"])
         result = rtree.get_nearest_k_points(input["lat"], input["lon"], input["k"])
+        locations=[]
+        labels=[]
+        first_lat=result[0]['lat']
+        first_lng=result[0]['lon']
+        for item in result:
+             locations.append({'lat': item['lat'], 'lng': item['lon']})
+             labels.append(item['name'])
     except Exception as e:
         return error_handling(e)
-    return jsonify(result), 200
+    #return jsonify(result), 200
+    return render_template("geomap.html", labels=labels, center_lat=first_lat, center_lng=first_lng, loc=locations)
 
 
 @app.route('/')
 def home():
    return render_template("home.html")
-
-@app.route('/data/', methods = ['POST', 'GET'])
-def data():
-    if request.method == 'GET':
-        return f"The URL /data is accessed directly. Try going to '/form' to submit form"
-    if request.method == 'POST':
-        form = request.form
-        return render_template('data.html',form = form)
-
-
-
-
-
 
 ## error handle and show traceback
 def error_handling(e):
