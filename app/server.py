@@ -143,7 +143,6 @@ def get_nearest_k_points():
         result = rtree.get_nearest_k_points(input["lat"], input["lon"], input["k"])
     except Exception as e:
         return error_handling(e)
-    print(result)
     return jsonify(result), 200
 
 ## error handle and show traceback
