@@ -30,7 +30,7 @@ coordinate = Coordinate()
 amenity_group = None
 world = geopandas.read_file(geopandas.datasets.get_path('naturalearth_lowres'))
 
-
+'''
 @app.route('/get_coordinates', methods=['GET'])
 def get_coordinates():
     input = {}
@@ -62,6 +62,7 @@ def get_coordinates():
 def error_handling(e):
     traceback.print_exc()
     return ("%s: %s" % (type(e).__name__, e.args[0]), 400)
+'''
 
 @app.route('/geomap',methods=['GET'])
 def geomap():
@@ -129,6 +130,7 @@ def full_chain():
     return jsonify(response), 200
 
 ## get coordinate data api
+'''
 @app.route('/get_coordinates', methods=['GET'])
 def get_coordinates():
     try:
@@ -141,6 +143,7 @@ def get_coordinates():
         "info": amenity_group.to_dict('index')
     }
     return jsonify(response), 200
+'''
 
 @app.route('/get_one_coordinate_form_amenity_group', methods=['GET'])
 def get_one_coordinate():
