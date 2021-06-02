@@ -16,6 +16,15 @@ class Rtree():
       self.idx.delete(point["id"], (point["lat"], point["lon"], point["lat"], point["lon"]))
       return "Delete Success"
 
-  def get_nearest_k_point(self, input_loc, k):    ## input loc: {lat, lon}
-    hits = self.idx.nearest((input_loc["lat"], input_loc["lon"], input_loc["lat"], input_loc["lon"]), k, objects = True)
-    return hits
+  def get_nearest_k_points(self, lat, lon, k):    ## input loc: {lat, lon}
+    hits = self.idx.nearest((lat, lon, lat, lon), k, objects = True)
+    k_point_result = []
+    for item in hits:
+      point = {
+        "id": item.id,
+        "lat": item.bbox[0],
+        "lon": item.bbox[1],
+        "name": item.object
+      }
+      k_point_result.append(point)
+    return k_point_result
