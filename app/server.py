@@ -1,5 +1,4 @@
 #import hashlib
-#import json
 #from textwrap import dedent
 #from time import time
 from uuid import uuid4
@@ -9,6 +8,7 @@ import numpy as np
 import geopandas
 import json
 import pandas as pd
+import random
 
 ## from our files
 from blockchain import Blockchain
@@ -24,6 +24,7 @@ node_identifiers = [str(uuid4()).replace('-', '') for i in range(k)]
 # Instantiate the Blockchain
 blockchain = Blockchain()
 coordinate = Coordinate()
+rtree = Rtree()
 node_index=0
 amenity_group = None
 
@@ -34,7 +35,7 @@ def geomap():
     locations = []
     for block in blockchain.chain:
         for trans in block['transactions']:
-            locations.append({'lat': trans['location'][0], 'lng': trans['location'][1]})
+            locations.append({'lat': trans['location'][0], 'lon': trans['location'][1]})
     return render_template("geomap.html", loc=locations)
 
 @app.route('/mine', methods=['GET'])
@@ -97,18 +98,9 @@ def full_chain():
 ## get coordinate data api
 @app.route('/get_coordinates', methods=['GET'])
 def get_coordinates():
-    input = {}
-    for i in ["lat_min", "lng_min", "lat_max", "lng_max", "type_name"]:
-        value = request.args.get(i)
-        if i in ["lat_min", "lng_min", "lat_max", "lng_max"]:
-            try:
-                if value is None or value == "": return "Key '%s' must be filled in." % i, 400     ## check all coordinates params has been filled in
-                value = float(value)
-            except ValueError as e:
-                return "The value of key '%s' must be float." % i, 400
-        input[i] = value
     try:
-        amenity_group = coordinate.get_amenity_from_osm(input["lat_min"], input["lng_min"], input["lat_max"], input["lng_max"])
+        input = get_params_checking(request, ["lat_min", "lon_min", "lat_max", "lon_max", "type_name"], ["lat_min", "lon_min", "lat_max", "lon_max"])
+        amenity_group = coordinate.get_amenity_from_osm(input["lat_min"], input["lon_min"], input["lat_max"], input["lon_max"])
     except Exception as e:
         return error_handling(e)
     response = {
@@ -121,11 +113,61 @@ def get_coordinates():
 def get_one_coordinate():
     if amenity_group is None: return "Please call get_coordinate API to get amenity_group.", 400
 
+## API for Rtree
+@app.route('/show_rtree_idx', methods=['GET'])
+def show_rtree_idx():
+    a, b = rtree.get_rtree_index()
+    print(a, b)
+    return "", 200
+
+@app.route("/update_rtree_index", methods=['POST'])
+def update_rtree_index():
+    array_values = request.get_json()
+    for values in array_values:
+        required = ['action', 'point']
+        if not all(k in values for k in required):
+            return 'Missing values', 400
+        point_required = ['lat', 'lon', 'name']
+        if not all(k in values["point"] for k in point_required):
+            return 'Point must have lat, lon and name', 400
+
+        point_id = random.randint(100000000000, 999999999999)
+        values["point"]["id"] = point_id
+        response = rtree.update_index(values["point"], values["action"])
+    return response, 200
+
+@app.route("/get_nearest_k_points", methods=['GET'])
+def get_nearest_k_points():
+    try:
+        input = get_params_checking(request, ["lat", "lon", "k"], ["lat", "lon"], ["k"])
+        result = rtree.get_nearest_k_points(input["lat"], input["lon"], input["k"])
+    except Exception as e:
+        return error_handling(e)
+    print(result)
+    return jsonify(result), 200
 
 ## error handle and show traceback
 def error_handling(e):
     traceback.print_exc()
     return ("%s: %s" % (type(e).__name__, e.args[0]), 400)
+
+def get_params_checking(request, blank_checking, float_checking=None, integer_checking=None):
+    input = {}
+    for i in blank_checking:
+        value = request.args.get(i)
+        if value is None or value == "": raise ValueError("Key '%s' must be filled in." % i)      ## check all coordinates params has been filled in
+        if i in float_checking:
+            try:
+                value = float(value)
+            except ValueError:
+                raise ValueError("The value of key '%s' must be float." % i)
+        elif i in integer_checking:
+            try:
+                value = int(value)
+            except ValueError:
+                raise ValueError("The value of key '%s' must be integer." % i)
+        input[i] = value
+    return input
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000)
