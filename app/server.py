@@ -7,9 +7,8 @@ from flask import Flask, jsonify, request, render_template
 from blockchain import Blockchain
 import numpy as np
 import geopandas
-import json
-import pandas as pd
-from rtree import index
+from map_data import Coordinate
+import traceback
 
 # Instantiate our Node
 app = Flask(__name__, template_folder='../templates', static_folder = '../static')
@@ -20,13 +19,42 @@ node_identifiers = [str(uuid4()).replace('-', '') for i in range(k)]
 # Instantiate the Blockchain
 blockchain = Blockchain()
 node_index=0
-
+coordinate = Coordinate()
+amenity_group = None
 world = geopandas.read_file(geopandas.datasets.get_path('naturalearth_lowres'))
 
 
-#idx = index.Index()
-#r_index=0
-#idx.insert(4321, (34.56, 56.32, 34.56, 56.32))
+@app.route('/get_coordinates', methods=['GET'])
+def get_coordinates():
+    input = {}
+    for i in ["lat_min", "lng_min", "lat_max", "lng_max", "type_name"]:
+        value = request.args.get(i)
+        if i in ["lat_min", "lng_min", "lat_max", "lng_max"]:
+            try:
+                if value is None or value == "": return "Key '%s' must be filled in." % i, 400     ## check all coordinates params has been filled in
+                value = float(value)
+            except ValueError as e:
+                return "The value of key '%s' must be float." % i, 400
+        input[i] = value
+    try:
+        amenity_group = coordinate.get_amenity_from_osm(input["lat_min"], input["lng_min"], input["lat_max"], input["lng_max"])
+    except Exception as e:
+        return error_handling(e)
+    response = {
+        "get_coordinates_number": len(amenity_group),
+        "info": amenity_group.to_dict('index')
+    }
+    #return jsonify(response), 200
+    amenity_group= amenity_group.rename(columns={'lon': 'lng'})
+    amenity_group=amenity_group.head(5)
+    first_lat=amenity_group['lat'].iloc[0]
+    first_lng=amenity_group['lng'].iloc[0]
+    return render_template("geomap.html", center_lat=first_lat, center_lng=first_lng, loc=amenity_group[['lat','lng']].to_dict("records"))
+
+## error handle and show traceback
+def error_handling(e):
+    traceback.print_exc()
+    return ("%s: %s" % (type(e).__name__, e.args[0]), 400)
 
 @app.route('/geomap',methods=['GET'])
 def geomap():
@@ -94,5 +122,17 @@ def full_chain():
     }
     return jsonify(response), 200
 
+@app.route('/')
+def home():
+   return render_template("home.html")
+ 
+@app.route('/data/', methods = ['POST', 'GET'])
+def data():
+    if request.method == 'GET':
+        return f"The URL /data is accessed directly. Try going to '/form' to submit form"
+    if request.method == 'POST':
+        form = request.form
+        return render_template('data.html',form = form)
+    
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000)
