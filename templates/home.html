@@ -4,12 +4,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hook</title>
+    <title>Food Around</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/shorthandcss@1.1.1/dist/shorthand.min.css" />
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Muli:200,300,400,500,600,700,800,900&display=swap" />
     <link rel="stylesheet" type="text/css"
         href="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.9.0/slick.min.css" />
     <link rel="stylesheet" type="text/css" href="//cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick-theme.css" />
+    <style type="text/css">
+    	select option {
+		  margin: 40px;
+		  background: rgba(0, 0, 0, 1);
+		  color: #fff;
+		  text-shadow: 0 1px 0 rgba(0, 0, 0, 1);
+		}
+	</style>
 </head>
 
 <body class="bg-black muli">
@@ -47,6 +55,14 @@
 														name = "k"
 														placeholder="K" />
 												<br />
+											    <select name="types" id="types"
+											    		class="input-lg half bw-0 fw-200 bg-indigo-lightest-10 white ph-indigo-lightest focus-white opacity-80 fs-s3 py-5 min-w-25vw br-r-0">
+											      <option value="restaurant">Restaurant</option>
+											      <option value="fast_food">Fast Food</option>
+											      <option value="cafe">Cafe</option>
+											      <option value="bar">Bar</option>
+											    </select>
+											    <br />
 												<input
 														class="button-lg bg-indigo-lightest-20 indigo-lightest focus-white fw-300 fs-s3 mr-0 br-l-0" type = "submit" value = "Search"/>
 										</form>
