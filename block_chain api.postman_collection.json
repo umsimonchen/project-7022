@@ -1,0 +1,710 @@
+{
+	"info": {
+		"_postman_id": "9f24f786-ac1e-4d92-aa70-78c5a6e0fa21",
+		"name": "block_chain api",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "rtree",
+			"item": [
+				{
+					"name": "get_nearest_k_point",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{block ser}}/get_nearest_k_points?lat=37.7&lon=-122.4444&k=3&types=restaurant",
+							"host": [
+								"{{block ser}}"
+							],
+							"path": [
+								"get_nearest_k_points"
+							],
+							"query": [
+								{
+									"key": "lat",
+									"value": "37.7"
+								},
+								{
+									"key": "lon",
+									"value": "-122.4444"
+								},
+								{
+									"key": "k",
+									"value": "3"
+								},
+								{
+									"key": "types",
+									"value": "restaurant"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "get coordinate",
+			"item": [
+				{
+					"name": "get_coordinates Copy 1",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:5000/get_coordinates?lon_min=85.143575&lon_max=147.557765&types=restaurant&lat_max=20&lat_min=-0.099203",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5000",
+							"path": [
+								"get_coordinates"
+							],
+							"query": [
+								{
+									"key": "lon_min",
+									"value": "85.143575"
+								},
+								{
+									"key": "lon_max",
+									"value": "147.557765"
+								},
+								{
+									"key": "types",
+									"value": "restaurant"
+								},
+								{
+									"key": "lat_max",
+									"value": "20"
+								},
+								{
+									"key": "lat_min",
+									"value": "-0.099203"
+								},
+								{
+									"key": "type",
+									"value": "",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get_coordinates Copy 2",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:5000/get_coordinates?types=restaurant&lat_min=17&lat_max=29&lon_min=85.143575&lon_max=147.557765",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5000",
+							"path": [
+								"get_coordinates"
+							],
+							"query": [
+								{
+									"key": "types",
+									"value": "restaurant"
+								},
+								{
+									"key": "lat_min",
+									"value": "17"
+								},
+								{
+									"key": "lat_max",
+									"value": "29"
+								},
+								{
+									"key": "lon_min",
+									"value": "85.143575"
+								},
+								{
+									"key": "lon_max",
+									"value": "147.557765"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get_coordinates Copy 3",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:5000/get_coordinates?lat_min=37.698&lon_min=-122.519&lat_max=37.819&lon_max=-122.354",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5000",
+							"path": [
+								"get_coordinates"
+							],
+							"query": [
+								{
+									"key": "lat_min",
+									"value": "37.698"
+								},
+								{
+									"key": "lon_min",
+									"value": "-122.519"
+								},
+								{
+									"key": "type",
+									"value": "",
+									"disabled": true
+								},
+								{
+									"key": "lat_max",
+									"value": "37.819"
+								},
+								{
+									"key": "lon_max",
+									"value": "-122.354"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get_coordinates Copy 4",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:5000/get_coordinates?lon_min=85.143575&lon_max=147.557765&types=restaurant&lat_min=35.5&lat_max=52",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5000",
+							"path": [
+								"get_coordinates"
+							],
+							"query": [
+								{
+									"key": "lon_min",
+									"value": "85.143575"
+								},
+								{
+									"key": "lon_max",
+									"value": "147.557765"
+								},
+								{
+									"key": "types",
+									"value": "restaurant"
+								},
+								{
+									"key": "lat_min",
+									"value": "35.5"
+								},
+								{
+									"key": "lat_max",
+									"value": "52"
+								},
+								{
+									"key": "type",
+									"value": "",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get_coordinates Copy 5",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:5000/get_coordinates?types=bar&lat_min=-0.099203&lat_max=52.321753&lon_min=85.143575&lon_max=147.557765",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5000",
+							"path": [
+								"get_coordinates"
+							],
+							"query": [
+								{
+									"key": "types",
+									"value": "bar"
+								},
+								{
+									"key": "lat_min",
+									"value": "-0.099203"
+								},
+								{
+									"key": "lat_max",
+									"value": "52.321753"
+								},
+								{
+									"key": "lon_min",
+									"value": "85.143575"
+								},
+								{
+									"key": "lon_max",
+									"value": "147.557765"
+								},
+								{
+									"key": "type",
+									"value": "",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get_coordinates Copy 6",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:5000/get_coordinates?types=fast_food&lat_min=-0.099203&lat_max=52.321753&lon_min=85.143575&lon_max=147.557765",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5000",
+							"path": [
+								"get_coordinates"
+							],
+							"query": [
+								{
+									"key": "types",
+									"value": "fast_food"
+								},
+								{
+									"key": "lat_min",
+									"value": "-0.099203"
+								},
+								{
+									"key": "lat_max",
+									"value": "52.321753"
+								},
+								{
+									"key": "lon_min",
+									"value": "85.143575"
+								},
+								{
+									"key": "lon_max",
+									"value": "147.557765"
+								},
+								{
+									"key": "type",
+									"value": "",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get_coordinates Copy 7",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:5000/get_coordinates?types=cafe&lat_min=-0.099203&lat_max=52.321753&lon_min=85.143575&lon_max=147.557765",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5000",
+							"path": [
+								"get_coordinates"
+							],
+							"query": [
+								{
+									"key": "types",
+									"value": "cafe"
+								},
+								{
+									"key": "lat_min",
+									"value": "-0.099203"
+								},
+								{
+									"key": "lat_max",
+									"value": "52.321753"
+								},
+								{
+									"key": "lon_min",
+									"value": "85.143575"
+								},
+								{
+									"key": "lon_max",
+									"value": "147.557765"
+								},
+								{
+									"key": "type",
+									"value": "",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get_coordinates Copy 8",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:5000/get_coordinates?lat_min=11.950295&lat_max=64.115251&lon_min=-130.923170&lon_max=-53.997841&types=bar",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5000",
+							"path": [
+								"get_coordinates"
+							],
+							"query": [
+								{
+									"key": "lat_min",
+									"value": "11.950295"
+								},
+								{
+									"key": "lat_max",
+									"value": "64.115251"
+								},
+								{
+									"key": "lon_min",
+									"value": "-130.923170"
+								},
+								{
+									"key": "lon_max",
+									"value": "-53.997841"
+								},
+								{
+									"key": "types",
+									"value": "bar"
+								},
+								{
+									"key": "type",
+									"value": "",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get_coordinates Copy 9",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:5000/get_coordinates?lat_min=37.698&lon_min=-122.519&lat_max=37.819&lon_max=-122.354",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5000",
+							"path": [
+								"get_coordinates"
+							],
+							"query": [
+								{
+									"key": "lat_min",
+									"value": "37.698"
+								},
+								{
+									"key": "lon_min",
+									"value": "-122.519"
+								},
+								{
+									"key": "type",
+									"value": "",
+									"disabled": true
+								},
+								{
+									"key": "lat_max",
+									"value": "37.819"
+								},
+								{
+									"key": "lon_max",
+									"value": "-122.354"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get_coordinates Copy 10",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:5000/get_coordinates?lat_min=37.698&lon_min=-122.519&lat_max=37.819&lon_max=-122.354",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5000",
+							"path": [
+								"get_coordinates"
+							],
+							"query": [
+								{
+									"key": "lat_min",
+									"value": "37.698"
+								},
+								{
+									"key": "lon_min",
+									"value": "-122.519"
+								},
+								{
+									"key": "type",
+									"value": "",
+									"disabled": true
+								},
+								{
+									"key": "lat_max",
+									"value": "37.819"
+								},
+								{
+									"key": "lon_max",
+									"value": "-122.354"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get_coordinates Copy 11",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:5000/get_coordinates?lat_min=37.698&lon_min=-122.519&lat_max=37.819&lon_max=-122.354",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5000",
+							"path": [
+								"get_coordinates"
+							],
+							"query": [
+								{
+									"key": "lat_min",
+									"value": "37.698"
+								},
+								{
+									"key": "lon_min",
+									"value": "-122.519"
+								},
+								{
+									"key": "type",
+									"value": "",
+									"disabled": true
+								},
+								{
+									"key": "lat_max",
+									"value": "37.819"
+								},
+								{
+									"key": "lon_max",
+									"value": "-122.354"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "export",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:5000/export_data?file_name=block8",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5000",
+							"path": [
+								"export_data"
+							],
+							"query": [
+								{
+									"key": "file_name",
+									"value": "block8"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "import",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:5000/update_coordinates_from_files?file_name=block1",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5000",
+							"path": [
+								"update_coordinates_from_files"
+							],
+							"query": [
+								{
+									"key": "file_name",
+									"value": "block1"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "block",
+			"item": [
+				{
+					"name": "get_chain",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "http://localhost:5000/chain",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5000",
+							"path": [
+								"chain"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "mine_block",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:5000/mine",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5000",
+							"path": [
+								"mine"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "validate_chain",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:5000/validate_chain",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "5000",
+							"path": [
+								"validate_chain"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "update_coordinate_by_input",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "[\r\n    {\r\n        \"action\": 0,\r\n        \"point\": {\r\n            \"lat\": 37.7995505,\r\n            \"lon\": -122.4370481,\r\n            \"name\": \"Mel's Drive-in\"\r\n        }\r\n    },\r\n    {\r\n        \"action\": 0,\r\n        \"point\": {\r\n            \"lat\": 37.8014859,\r\n            \"lon\": -122.4095533,\r\n            \"name\": \"Mama's on Washington Square\"\r\n        }\r\n    }\r\n]",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{block ser}}/update_coordinate_by_input",
+							"host": [
+								"{{block ser}}"
+							],
+							"path": [
+								"update_coordinate_by_input"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "update_coordinate_by_search_result",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "[\r\n    {\r\n        \"action\": 0,\r\n        \"point\": {\r\n            \"lat\": 37.7995505,\r\n            \"lon\": -122.4370481,\r\n            \"name\": \"Mel's Drive-in\"\r\n        }\r\n    },\r\n    {\r\n        \"action\": 0,\r\n        \"point\": {\r\n            \"lat\": 37.8014859,\r\n            \"lon\": -122.4095533,\r\n            \"name\": \"Mama's on Washington Square\"\r\n        }\r\n    }\r\n]",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{block ser}}/update_coordinate_by_search_result",
+							"host": [
+								"{{block ser}}"
+							],
+							"path": [
+								"update_coordinate_by_search_result"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}
