@@ -1,0 +1,1 @@
+{"types": "fast_food", "lat_min": 11.950295, "lat_max": 64.115251, "lon_min": -130.92317, "lon_max": -53.997841}

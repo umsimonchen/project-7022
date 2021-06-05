@@ -1,0 +1,1 @@
+{"types": "restaurant", "lat_min": -0.099203, "lat_max": 20.0, "lon_min": 85.143575, "lon_max": 147.557765}
