@@ -19,6 +19,12 @@
         width: 100%;
         /* The width is the width of the web page */
       }
+      select option {
+			  margin: 40px;
+			  background: rgba(0, 0, 0, 1);
+			  color: #fff;
+			  text-shadow: 0 1px 0 rgba(0, 0, 0, 1);
+			}
     </style>
 		<script src="https://unpkg.com/@googlemaps/markerclustererplus/dist/index.min.js"></script>
     <script>
@@ -45,7 +51,7 @@
 					return new google.maps.Marker({
 						position: location,
 						map: map,
-						label: (i+1).toString(),
+						label: (i).toString(),
 						title: titles[i],
 					});
 				});
@@ -88,6 +94,13 @@
 								class="input-lg bw-0 fw-200 bg-indigo-lightest-10 white ph-indigo-lightest focus-white opacity-80 fs-s3 py-5 min-w-25vw br-r-0"
 								min="1" name = "k"
 								placeholder="K" >
+						<select name="types" id="types"
+				    		class="input-lg half bw-0 fw-200 bg-indigo-lightest-10 white ph-indigo-lightest focus-white opacity-80 fs-s3 py-5 min-w-25vw br-r-0">
+				      <option value="restaurant">Restaurant</option>
+				      <option value="fast_food">Fast Food</option>
+				      <option value="cafe">Cafe</option>
+				      <option value="bar">Bar</option>
+				    </select>
 						<input
 								class="button-lg bg-indigo-lightest-20 indigo-lightest focus-white fw-300 fs-s3 mr-0 br-l-0" type = "submit" value = "Search"/>
 				</form>

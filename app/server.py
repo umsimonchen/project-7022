@@ -151,8 +151,8 @@ def get_nearest_k_points():
     try:
         input = get_params_checking(request, ["lat", "lon", "k"], ["lat", "lon"], ["k"])
         result = rtree.get_nearest_k_points(input["lat"], input["lon"], input["k"])
-        locations=[]
-        labels=[]
+        locations=[{'lat': input["lat"], 'lng': input["lon"]}]
+        labels=["Your Location"]
         first_lat=result[0]['lat']
         first_lng=result[0]['lon']
         for item in result:
