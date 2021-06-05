@@ -8,6 +8,7 @@ import numpy as np
 import geopandas
 import json
 import pandas as pd
+import os
 
 ## from our files
 from blockchain import Blockchain
@@ -37,6 +38,8 @@ def geomap():
             locations.append({'lat': trans['location'][0], 'lon': trans['location'][1]})
     return render_template("geomap.html", loc=locations)
 
+
+## API with blockchain
 @app.route('/mine', methods=['GET'])
 def mine():
     last_block = blockchain.last_block
@@ -57,6 +60,47 @@ def mine():
     }
     return jsonify(response), 200
 
+
+@app.route('/validate_chain', methods=['GET'])
+def validate_chain():
+    result = blockchain.valid_chain()
+    return "The result of the chain validation is %s" % result, 200
+
+
+@app.route('/chain', methods=['GET'])
+def full_chain():
+    response = {
+        'length': len(blockchain.chain),
+        'chain': blockchain.chain,
+    }
+    return jsonify(response), 200
+
+
+## get coordinate data API
+
+@app.route('/get_coordinates', methods=['GET'])
+def get_coordinates():
+    try:
+        input = get_params_checking(request, ["lat_min", "lon_min", "lat_max", "lon_max"], ["lat_min", "lon_min", "lat_max", "lon_max"])
+        amenity_group = coordinate.get_amenity_from_osm(input["lat_min"], input["lon_min"], input["lat_max"], input["lon_max"], type_name=input["types"])
+    except Exception as e:
+        return error_handling(e)
+    response = {
+        "get_coordinates_number": len(amenity_group),
+        "info": amenity_group.to_dict('index')
+    }
+    return jsonify(response), 200
+
+@app.route('/export_data', methods=['GET'])
+def export_data():
+    input = get_params_checking(request, ["file_name"])
+    coordinate.amenity_group.to_csv('../coordinates/%s.csv' % input["file_name"], index=False)
+    out_file = open("../coordinates/%s_remark.txt" % input["file_name"], "w")
+    json.dump(coordinate.remark, out_file)
+    return "Export files Finish.", 200
+
+
+## API for input data
 @app.route('/update_coordinate_by_input', methods=['POST'])  # this is a POST request, since we’ll be sending data to it.
 def update_coordinate_by_input():
     array_values = request.get_json()
@@ -98,59 +142,26 @@ def update_coordinate_by_search_result():
     response = {'message': f'{count} Transactions will be added to Block {new}'}
     return jsonify(response), 201
 
-@app.route('/validate_chain', methods=['GET'])
-def validate_chain():
-    result = blockchain.valid_chain()
-    return "The result of the chain validation is %s" % result, 200
+@app.route('/update_coordinates_from_files', methods=['GET'])
+def import_data():
+    input = get_params_checking(request, ["file_name"])
+    if os.path.isfile("../coordinates/%s.csv" % input["file_name"]) == False: return "Files not found.", 400
+    amenity_group = pd.read_csv('../coordinates/%s.csv' % input["file_name"])
+    coordinate.write_amenity_group(amenity_group)
 
-
-@app.route('/chain', methods=['GET'])
-def full_chain():
-    response = {
-        'length': len(blockchain.chain),
-        'chain': blockchain.chain,
-    }
+    in_file = open("../coordinates/%s_remark.txt" % input["file_name"], "r")
+    remark = json.load(in_file)
+    coordinate.write_remark(remark)
+    response = {'message': f'{input["file_name"]}\'s informations has imported into amenity group.'}
     return jsonify(response), 200
-
-
-
-## get coordinate data api
-
-@app.route('/get_coordinates', methods=['GET'])
-def get_coordinates():
-    try:
-        input = get_params_checking(request, ["lat_min", "lon_min", "lat_max", "lon_max"], ["lat_min", "lon_min", "lat_max", "lon_max"])
-        amenity_group = coordinate.get_amenity_from_osm(input["lat_min"], input["lon_min"], input["lat_max"], input["lon_max"])
-    except Exception as e:
-        return error_handling(e)
-    response = {
-        "get_coordinates_number": len(amenity_group),
-        "info": amenity_group.to_dict('index')
-    }
-    return jsonify(response), 200
-
-
 
 ## API for Rtree
-@app.route("/update_rtree_index", methods=['POST'])
-def update_rtree_index():
-    array_values = request.get_json()
-    for values in array_values:
-        required = ['point']
-        if not all(k in values for k in required):
-            return 'Missing values', 400
-        point_required = ['id', 'lat', 'lon', 'name']
-        if not all(k in values["point"] for k in point_required):
-            return 'Point must have id, lat, lon and name', 400
-
-        response = rtree.update_index(values["point"])
-    return response, 200
 
 @app.route("/get_nearest_k_points", methods=['GET'])
 def get_nearest_k_points():
     try:
-        input = get_params_checking(request, ["lat", "lon", "k"], ["lat", "lon"], ["k"])
-        result = rtree.get_nearest_k_points(input["lat"], input["lon"], input["k"])
+        input = get_params_checking(request, ["lat", "lon", "k", "types"], ["lat", "lon"], ["k"])
+        result = rtree.get_nearest_k_points(blockchain, input["lat"], input["lon"], input["k"], input["types"])
         locations=[{'lat': input["lat"], 'lng': input["lon"]}]
         labels=["Your Location"]
         first_lat=result[0]['lat']
@@ -180,7 +191,7 @@ def error_handling(e):
     traceback.print_exc()
     return ("%s: %s" % (type(e).__name__, e.args[0]), 400)
 
-def get_params_checking(request, blank_checking, float_checking=None, integer_checking=None):
+def get_params_checking(request, blank_checking, float_checking=[], integer_checking=[]):
     input = {}
     for i in request.args:
         input[i] = request.args.get(i)

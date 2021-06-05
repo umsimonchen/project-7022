@@ -11,7 +11,7 @@ class Blockchain(object):
         self.current_transactions = []
         self.chain = []
         self.nodes = set()
-        self.remark = []
+        self.remark = {}
 
         # Create the genesis block
         self.new_block(previous_hash=1, proof=100)
@@ -35,14 +35,13 @@ class Blockchain(object):
 
         # Reset the current list of transactions
         self.current_transactions = []
-        self.remark = []
+        self.remark = {}
 
         self.chain.append(block)
         return block
 
     def new_remark(self, remark):
-        self.remark.append(remark)
-        return self.last_block['index'] + 1
+        self.remark = remark
 
     def new_transaction(self, point_id, lat, lon, name):
         self.current_transactions.append({
