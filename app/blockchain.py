@@ -11,13 +11,12 @@ class Blockchain(object):
         self.current_transactions = []
         self.chain = []
         self.nodes = set()
-
-        rtree_signature = self.idx_hash(idx = rtree.idx)
+        self.remark = []
 
         # Create the genesis block
-        self.new_block(previous_hash=1, proof=100, rtree_signature=rtree_signature)
+        self.new_block(previous_hash=1, proof=100)
 
-    def new_block(self, proof, rtree_signature, previous_hash=None, idx=None):
+    def new_block(self, proof, previous_hash=None, idx=None):
         """
         Create a new Block in the Blockchain
         :param proof: <int> The proof given by the Proof of Work algorithm
@@ -31,18 +30,22 @@ class Blockchain(object):
             'transactions': self.current_transactions,
             'proof': proof,
             'previous_hash': previous_hash or self.hash(self.chain[-1]),
-            'rtree_signature': rtree_signature
+            'remark': self.remark
         }
 
         # Reset the current list of transactions
         self.current_transactions = []
+        self.remark = []
 
         self.chain.append(block)
         return block
 
-    def new_transaction(self, point_id, lat, lon, name, action):
+    def new_remark(self, remark):
+        self.remark.append(remark)
+        return self.last_block['index'] + 1
+
+    def new_transaction(self, point_id, lat, lon, name):
         self.current_transactions.append({
-            'action': action,
             'id': point_id,
             'lat': lat,
             'lon': lon,
@@ -56,11 +59,7 @@ class Blockchain(object):
         return self.chain[-1]
 
     @staticmethod
-    def idx_hash(idx):
-        idx_string = json.dumps(str(idx), sort_keys=True).encode()
-        return hashlib.sha256(idx_string).hexdigest()
-
-    def hash(self, block):
+    def hash(block):
         """
         Creates a SHA-256 hash of a Block
         :param block: <dict> Block

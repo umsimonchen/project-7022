@@ -21,37 +21,13 @@ app = Flask(__name__, template_folder='../templates', static_folder = '../static
 k=1000 #1000 usersl
 node_identifiers = [str(uuid4()).replace('-', '') for i in range(k)]
 # Instantiate the Blockchain
-blockchain = Blockchain()
-coordinate = Coordinate()
 rtree = Rtree()
+blockchain = Blockchain(rtree)              ## new blockchain need to new rtree first
+coordinate = Coordinate()
 node_index=0
 coordinate = Coordinate()
 
 world = geopandas.read_file(geopandas.datasets.get_path('naturalearth_lowres'))
-
-# @app.route('/get_coordinates', methods=['GET'])
-# def get_coordinates():
-#     input = {}
-#     for i in ["lat_min", "lng_min", "lat_max", "lng_max", "type_name"]:
-#         value = request.args.get(i)
-#         if i in ["lat_min", "lng_min", "lat_max", "lng_max"]:
-#             try:
-#                 if value is None or value == "": return "Key '%s' must be filled in." % i, 400     ## check all coordinates params has been filled in
-#                 value = float(value)
-#             except ValueError as e:
-#                 return "The value of key '%s' must be float." % i, 400
-#         input[i] = value
-#     try:
-#         amenity_group = coordinate.get_amenity_from_osm(input["lat_min"], input["lng_min"], input["lat_max"], input["lng_max"])
-#     except Exception as e:
-#         return error_handling(e)
-#     response = {
-#         "get_coordinates_number": len(amenity_group),
-#         "info": amenity_group.to_dict('index')
-#     }
-#     return jsonify(response), 200
-
-
 
 @app.route('/geomap',methods=['GET'])
 def geomap():
@@ -76,7 +52,8 @@ def mine():
         'index': block['index'],
         'transactions': block['transactions'],
         'proof': block['proof'],
-        'previous_hash': block['previous_hash']
+        'previous_hash': block['previous_hash'],
+        'remark': block['remark']
     }
     return jsonify(response), 200
 
@@ -85,7 +62,7 @@ def update_coordinate_by_input():
     array_values = request.get_json()
     count = 0
     for values in array_values:
-        required = ['action', 'point']
+        required = ['point']
         if not all(k in values for k in required):
             return 'Missing values', 400
         point_required = ['id', 'lat', 'lon', 'name']
@@ -93,7 +70,7 @@ def update_coordinate_by_input():
             return 'Point must have id, lat, lon and name', 400
 
         # Create a new Transaction
-        new = blockchain.new_transaction(values["point"]['id'], values["point"]['lat'], values["point"]['lon'], values["point"]['name'], values["action"])
+        new = blockchain.new_transaction(values["point"]['id'], values["point"]['lat'], values["point"]['lon'], values["point"]['name'])
         count += 1
 
     response = {'message': f'{count} Transactions will be added to Block {new}'}
@@ -105,6 +82,7 @@ def update_coordinate_by_search_result():
     if coordinate.check_amenity_group_none() == True: return "No Data have to update.", 200
 
     amenity_group_list = coordinate.get_amenity_group().reset_index().values.tolist()
+    blockchain.new_remark(coordinate.remark)
     for item in amenity_group_list:
         point_id = item[0]
         lat = item[1]
@@ -112,7 +90,7 @@ def update_coordinate_by_search_result():
         name = item[3]
 
         # Create a new Transaction
-        new = blockchain.new_transaction(point_id, lat, lon, name, 0)
+        new = blockchain.new_transaction(point_id, lat, lon, name)
         count += 1
     amenity_group_list = None
     coordinate.make_amenity_group_to_none()
@@ -153,26 +131,19 @@ def get_coordinates():
 
 
 
-
-
 ## API for Rtree
-@app.route('/show_rtree_idx', methods=['GET'])
-def show_rtree_idx():
-    a, b = rtree.get_rtree_index()
-    return "inputed_block = %s,\n idx = %s" % (a, str(b)), 200
-
 @app.route("/update_rtree_index", methods=['POST'])
 def update_rtree_index():
     array_values = request.get_json()
     for values in array_values:
-        required = ['action', 'point']
+        required = ['point']
         if not all(k in values for k in required):
             return 'Missing values', 400
         point_required = ['id', 'lat', 'lon', 'name']
         if not all(k in values["point"] for k in point_required):
             return 'Point must have id, lat, lon and name', 400
 
-        response = rtree.update_index(values["point"], values["action"])
+        response = rtree.update_index(values["point"])
     return response, 200
 
 @app.route("/get_nearest_k_points", methods=['GET'])
@@ -196,6 +167,13 @@ def get_nearest_k_points():
 @app.route('/')
 def home():
    return render_template("home.html")
+
+
+## rtree signature checking
+def rtree_signature_checking(rtree, blockchain):
+    current_rtree_signature = rtree.get_idx_signature()
+    blockchain_rtree_signature = blockchain.last_block["rtree_signature"]
+    return current_rtree_signature == blockchain_rtree_signature
 
 ## error handle and show traceback
 def error_handling(e):

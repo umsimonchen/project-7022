@@ -4,6 +4,7 @@ import pandas as pd
 class Coordinate():
   def __init__(self):
     self.amenity_group = pd.DataFrame()
+    self.remark = {}
 
   def get_amenity_group(self):
     return self.amenity_group
@@ -19,6 +20,13 @@ class Coordinate():
     amenity_group_total = osm.node_query(
       lat_min, lon_min, lat_max, lon_max, tags='"amenity"="%s"' % type_name)
     self.amenity_group = amenity_group_total[["lat", "lon", "name"]]
+    self.remark = {
+      "type": type_name,
+      "lat_min": lat_min,
+      "lat_max": lat_max,
+      "lon_min": lon_min,
+      "lon_max": lon_max
+    }
     return self.amenity_group
 
   def get_one_sample_from_amenity(self, amenity_group):
